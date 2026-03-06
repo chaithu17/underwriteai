@@ -136,30 +136,3 @@ Run (inside backend environment with dependencies installed):
 cd backend
 pytest -q
 ```
-
-Detailed manual/automation checklist: `docs/testing.md`.
-
-## Deployment
-
-### Frontend (Vercel)
-
-```bash
-cd frontend
-vercel
-```
-
-Set:
-
-- `NEXT_PUBLIC_API_BASE_URL=https://<backend-domain>/api/v1`
-
-### Backend (AWS ECS or GCP Cloud Run)
-
-See [docs/deployment.md](docs/deployment.md) for full commands.
-
-## Next Production Upgrades
-
-- Add auth (OIDC/JWT) and tenant-aware access controls.
-- Add Alembic migration workflow.
-- Add caching + async task queues (Celery/Redis) for heavy OCR jobs.
-- Add model evaluation dashboards and policy tuning interface.
-- Add observability stack (OpenTelemetry + tracing + SLA alerts).
