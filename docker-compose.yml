@@ -1,0 +1,72 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: underwrite-postgres
+    environment:
+      POSTGRES_USER: underwrite
+      POSTGRES_PASSWORD: underwrite
+      POSTGRES_DB: underwrite_ai
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: underwrite-ollama
+    ports:
+      - '11434:11434'
+    volumes:
+      - ollama_data:/root/.ollama
+
+  backend:
+    build:
+      context: ./backend
+    container_name: underwrite-backend
+    environment:
+      DATABASE_URL: postgresql+psycopg2://underwrite:underwrite@postgres:5432/underwrite_ai
+      LLM_PROVIDER: ollama
+      LLM_MODEL: ${LLM_MODEL:-llama3.1:8b}
+      OLLAMA_BASE_URL: http://ollama:11434
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-nomic-embed-text}
+      VECTOR_DB_PATH: /app/chroma_db
+      ENABLE_VECTOR_STORE: 'true'
+      CORS_ORIGINS: '["http://localhost:3000", "http://localhost:8080"]'
+    volumes:
+      - ./backend/uploads:/app/uploads
+      - chroma_data:/app/chroma_db
+    depends_on:
+      - postgres
+      - ollama
+    ports:
+      - '8000:8000'
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: underwrite-frontend
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8000/api/v1
+    depends_on:
+      - backend
+    ports:
+      - '3000:3000'
+
+  api-gateway:
+    image: nginx:1.27-alpine
+    container_name: underwrite-gateway
+    depends_on:
+      - frontend
+      - backend
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - '8080:8080'
+
+volumes:
+  postgres_data:
+  ollama_data:
+  chroma_data:

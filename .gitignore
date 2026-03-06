@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+
+# Node
+node_modules/
+.next/
+
+# Env
+.env
+.env.local
+*.env
+
+# Runtime
+uploads/
+*.log
+
+# OS
+.DS_Store
