@@ -21,13 +21,27 @@ try:
 except Exception:  # pragma: no cover
     ChatOllama = None
 
+try:
+    from langchain_groq import ChatGroq
+except Exception:  # pragma: no cover
+    ChatGroq = None
+
 
 class DocumentProcessingService:
     def __init__(self) -> None:
         self.settings = get_settings()
         self._llm = None
 
-        if self.settings.llm_provider.lower() == 'ollama' and ChatOllama:
+        if self.settings.llm_provider.lower() == 'groq' and ChatGroq and self.settings.groq_api_key:
+            try:
+                self._llm = ChatGroq(
+                    model=self.settings.groq_model,
+                    api_key=self.settings.groq_api_key,
+                    temperature=0,
+                )
+            except Exception:
+                self._llm = None
+        elif self.settings.llm_provider.lower() == 'ollama' and ChatOllama:
             try:
                 self._llm = ChatOllama(
                     model=self.settings.llm_model,

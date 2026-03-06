@@ -14,6 +14,11 @@ except Exception:  # pragma: no cover
     ChatPromptTemplate = None
     ChatOllama = None
 
+try:
+    from langchain_groq import ChatGroq
+except Exception:  # pragma: no cover
+    ChatGroq = None
+
 
 class DocumentAgentOutput(BaseModel):
     summary: str
@@ -49,7 +54,16 @@ class UnderwritingAgentOrchestrator:
         self.settings = get_settings()
         self.llm = None
 
-        if self.settings.llm_provider.lower() == 'ollama' and ChatOllama:
+        if self.settings.llm_provider.lower() == 'groq' and ChatGroq and self.settings.groq_api_key:
+            try:
+                self.llm = ChatGroq(
+                    model=self.settings.groq_model,
+                    api_key=self.settings.groq_api_key,
+                    temperature=0.1,
+                )
+            except Exception:
+                self.llm = None
+        elif self.settings.llm_provider.lower() == 'ollama' and ChatOllama:
             try:
                 self.llm = ChatOllama(
                     model=self.settings.llm_model,
