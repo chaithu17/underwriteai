@@ -5,7 +5,7 @@ It combines deterministic risk formulas, document intelligence (OCR + LLM extrac
 
 ## Tech Stack
 
-- Frontend: Next.js, TypeScript, TailwindCSS, Shadcn-style UI components, Recharts
+- Frontend: Next.js, TypeScript, TailwindCSS, Shadcn-style UI components
 - Backend: FastAPI, Pydantic, SQLAlchemy, PostgreSQL
 - AI Layer: Free local Ollama models, LangChain multi-agent orchestration, RAG retrieval
 - Document Processing: Tesseract OCR + LLM structured extraction
